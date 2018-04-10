@@ -5,7 +5,6 @@ package main
 
 import (
 	"context"
-	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -31,7 +30,7 @@ type Arith int
 type Arith2 int
 
 func (t *Arith2) Mul(ctx context.Context, args *Args, reply *Reply) error {
-	reply.C = args.A * args.B * 3
+	reply.C = args.A * args.B * 1
 	return nil
 }
 
@@ -46,7 +45,7 @@ func (t *Arith) Add(ctx context.Context, args *Args, reply *Reply) error {
 }
 
 var (
-	addr     = flag.String("addr", "localhost:8973", "server address")
+	addr     = flag.String("addr", "localhost:8972", "server address")
 	etcdAddr = flag.String("etcdAddr", "localhost:2379", "etcd address")
 	basePath = flag.String("base", "/rpcx_test", "prefix path")
 )
@@ -90,14 +89,11 @@ func addYouJinPlugin(s *server.Server) {
 type YouJinPlugin struct {
 }
 
-func (youjin *YouJinPlugin)  (ctx context.Context, r *protocol.Message, e error) error {
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	case <-time.After(1 * time.Second):
-		fmt.Println("超时！！！")
-	}
-
-	fmt.Println("拒绝!")
-	return errors.New("invalid token")
+func (youjin *YouJinPlugin) PostReadRequest(ctx context.Context, r *protocol.Message, e error) error {
+	fmt.Println("---  接收到消息  ---")
+	// if rand.Seed(time.Now().UnixNano()); rand.Intn(10)%2 == 0 {
+	// 	fmt.Println("===  返回错误!  ===")
+	// 	return errors.New("不行不行啊~~~")
+	// }
+	return nil
 }
